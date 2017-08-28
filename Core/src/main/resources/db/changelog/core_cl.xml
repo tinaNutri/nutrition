@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog  
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd"
+	logicalFilePath="/CommerceBackOffice/core_cl.xml">
+	
+	<changeSet id="0.0.1" author="Kala Liu" dbms="oracle">
+		<sqlFile encoding="utf8" path="db/changelog/sql/core.sql"
+			splitStatements="true" stripComments="true" />
+	</changeSet>	
+</databaseChangeLog>

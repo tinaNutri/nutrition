@@ -1,0 +1,43 @@
+---
+spring:
+  profiles: default
+  datasource:
+    url: jdbc:mysql://localhost:3306/nutri_core_dev?createDatabaseIfNotExist=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&nullNamePatternMatchesAll=true
+    username: root
+    password: 123abcABC
+    driver-class-name: com.mysql.jdbc.Driver
+---
+spring:
+  profiles: dev
+  datasource:
+    driverClassName: oracle.jdbc.OracleDriver
+    url: jdbc:oracle:thin:@172.17.118.36:1521/orcl
+    username: DWTC_CORE
+    password: DWTC_CORE
+---
+spring:
+  profiles: test
+  
+  datasource:
+    url: jdbc:mysql://db-server:3306/dwtc_core_test?createDatabaseIfNotExist=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8
+    username: root
+    password: 123abcABC
+---
+spring:
+  profiles: production
+  
+  datasource:
+    url: jdbc:mysql://dwtcproddb.c7nkkcz69ari.us-west-2.rds.amazonaws.com/dwtc_core_prod?createDatabaseIfNotExist=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8
+    username: dwtc_prod_user
+    password: 5Cgq$4815y2o
+---
+spring:
+  profiles: staging
+
+  datasource:
+    url: jdbc:mysql://db-server:3306/dwtc_core_staging?createDatabaseIfNotExist=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8
+    username: root
+    password: 123abcABC
+
+
+

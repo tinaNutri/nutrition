@@ -1,0 +1,16 @@
+rootProject.name = 'nutri'
+
+
+include 'Core'
+include 'Biz'
+
+
+rootProject.children.each{
+  it.name=rootProject.name+it.name
+}
+
+
+// //include 'buildSrc' is used to proccess resource file that in project 'buildSrc'
+// include 'buildSrc'
+// // Exposes gradle buildSrc for OracleCommerceCloud support
+// rootProject.children.find{ it.name == "buildSrc" }.name = "occ-build-src"

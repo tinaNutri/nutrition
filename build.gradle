@@ -1,0 +1,282 @@
+def rootname = 'nutri'
+
+buildscript {
+	ext {
+        springBootVersion = '1.4.0.RELEASE'
+    }
+    repositories {
+        maven { url "https://repo.spring.io/libs-release" }
+        mavenLocal()
+        jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE"
+        //classpath "gradle.plugin.org.hidetake:gradle-swagger-generator-plugin:2.4.2"
+
+   }
+}
+
+
+configure(allprojects) { project ->
+    apply plugin: 'eclipse-wtp'
+    group = 'tina.nutri'
+    version = qualifyVersionIfNecessary(version)
+	ext.rootBuildDir   = rootProject.buildDir
+
+	ext.buildSrcResourceDirPath   = "${rootBuildDir}/../buildSrc/build/resources/main/"
+
+
+    ext.httpclientVersion   ="4.5.1"
+    ext.gsonVerion          ="2.6.1"
+    ext.log4jVersion        ="1.2.17"
+
+    ext.servletVersion      ="3.1.0"
+    ext.jstlVersion         ="1.2"
+    ext.javamailVersion     ="1.5.0-b01"
+    ext.quartzVersion       ="2.2.1"
+    ext.commonsHttpclientVersion = "3.1"
+    ext.openCSVVersion 		  ="3.7"
+    ext.commonsSCVVersion 	="1.4"
+
+
+
+    ext.springVersion ="4.3.2.RELEASE"
+    ext.ehcacheVersion="2.9.1"
+    // ext.springBootStarterWebVersion ="1.4.0.RELEASE"
+
+    ext.mysqlconnectorVersion="6.0.6"
+    ext.ojdbcVersion="11.2.0.3"
+
+	ext.testngVersion       ="6.9.10"
+
+    ext.commonsdbcpVersion  ="1.4"
+
+	ext.hibernate4Version = "4.3.11.Final"
+  	ext.hibernateAnnotationsVersion = "4.0.5.Final"
+  	// ext.hibernateJpaVersion ="1.0.0.Final"
+
+  	ext.commonsLang3Version = "3.3.2"
+  	ext.commonsHttpclientVersion = "3.1"
+  	ext.jsonSimpleVersion = "1.1.1"
+  	ext.freemarkerVersion = "2.3.23"
+  	ext.commonsIoVersion = "2.5"
+  	ext.jacksonDatabindVersion = "2.7.3"
+
+	ext.springDataJpaVersion ="1.10.2.RELEASE"
+  	ext.eclipseLinkVersion = "2.5.0"
+	ext.junitVersion = "4.12"
+  	ext.commonsioVersion = "2.4"
+  	ext.aspectjweaverVersion="1.8.9"
+
+	ext.moduleName =  project.name.toLowerCase();
+
+	ext.spartaspringwebutilsVersion = "1.3.3"
+	ext.springwsVersion="2.2.4.RELEASE"
+
+	ext.swagger = "2.7.0"
+    ext.swagger2Version="2.5.0"
+    ext.swaggerUIVersion = "2.5.0"
+    ext.swaggerAnnotationsVersion="1.5.2"
+	ext.beanutilsVersion="1.9.3"
+    ext.wss4jVersion = "1.5.6"
+	ext.axisVersion = "1.7.5"
+	ext.mybatisVersion = "1.3.1"
+}
+
+
+subprojects {
+    apply plugin: 'java'
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    targetCompatibility = JavaVersion.VERSION_1_7
+
+	configurations {
+		DBDriver {
+			description = 'DBDriver jar file that project needed.'
+			visible = false
+		}
+        // all*.exclude module : 'spring-boot-starter-logging'
+	}
+
+	dependencies {
+		DBDriver   "mysql:mysql-connector-java:${mysqlconnectorVersion}"
+	}
+    //dependencies{
+    //    DBDriver "com.oracle:ojdbc6:${ojdbcVersion}"
+   // }
+
+
+  repositories {
+          //maven{ url "${LocalArtifactoryURL}" }
+          mavenLocal()
+          jcenter()
+          maven { url "https://repo.spring.io/libs-release" }
+  }
+
+  if(!project.name.equalsIgnoreCase("${rootname}")){
+    apply plugin: 'java'
+    apply plugin : 'war'
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    targetCompatibility = JavaVersion.VERSION_1_7
+
+    apply plugin: 'spring-boot'
+    task production << {
+      bootRun.systemProperty 'spring.profiles.active', 'production'
+    }
+    bootRun {
+        jvmArgs "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8787"
+    }
+    //All CBO projects need dependents, and others can be jar as a war
+
+    if(!project.name.equalsIgnoreCase("${rootname}Core")){
+        apply plugin : 'war'
+        dependencies {
+          compile project(":${rootname}Core")
+        }
+    }
+
+    dependencies {
+      compile("org.springframework.boot:spring-boot-starter-web")
+      providedRuntime "org.springframework.boot:spring-boot-starter-tomcat"
+      compile "org.springframework:spring-context-support:${springVersion}"
+
+      //for monitor
+      compile("org.springframework.boot:spring-boot-starter-actuator")
+      compile("org.jolokia:jolokia-core:1.3.4")
+      // compile "de.codecentric:spring-boot-admin-starter-client:${springbootAdminVersion}"
+
+      testCompile("org.springframework.boot:spring-boot-starter-test")
+      testCompile("junit:junit")
+    }
+
+  }
+}
+
+project("${rootname}Core") {
+  description = "Core project"
+  dependencies {
+        compile configurations.DBDriver.asFileTree
+        DBDriver   "mysql:mysql-connector-java:${mysqlconnectorVersion}"
+        // compile "com.oracle:ojdbc6:${ojdbcVersion}"
+        //compile("org.springframework.boot:spring-boot-starter-data-jpa"){
+          //  exclude group:"org.hibernate.javax.persistence" , module:"hibernate-jpa-2.1-api"
+        //}
+		compile "org.mybatis.spring.boot:mybatis-spring-boot-starter:${mybatisVersion}"
+        compile "org.quartz-scheduler:quartz:${quartzVersion}"
+        compile("org.liquibase:liquibase-core")
+	    //DB dependency
+		compile "org.springframework:spring-jdbc:${springVersion}"
+		compile "org.springframework:spring-orm:${springVersion}"
+		// compile "org.hibernate:hibernate-core:${hibernate4Version}"
+		// compile "org.hibernate:hibernate-entitymanager:${hibernate4Version}"
+		// compile "org.hibernate:hibernate-ehcache:${hibernate4Version}"
+		// compile "org.hibernate.common:hibernate-commons-annotations:${hibernateAnnotationsVersion}"
+		// compile "org.hibernate.javax.persistence:hibernate-jpa-2.1-api:${hibernateJpaVersion}"
+		//compile "org.springframework.data:spring-data-jpa:${springDataJpaVersion}"
+
+
+		compile "org.springframework:spring-context:${springVersion}"
+		compile "commons-io:commons-io:${commonsioVersion}"
+		compile "commons-fileupload:commons-fileupload:1.2.1"
+		compile "org.quartz-scheduler:quartz:${quartzVersion}"
+		compile "org.freemarker:freemarker:${freemarkerVersion}"
+		compile "commons-beanutils:commons-beanutils:${beanutilsVersion}"
+		testCompile "org.springframework:spring-test:${springVersion}"
+		testCompile "junit:junit:${junitVersion}"
+		runtime "commons-dbcp:commons-dbcp:${commonsdbcpVersion}"
+        //compile project(":${rootname}OCCClient")
+        //compile project(":${rootname}Swagger")
+  }
+}
+
+
+
+
+project("${rootname}Biz") {
+	description = "${rootname} Biz project"
+	dependencies {
+		compile "org.springframework:spring-context:${springVersion}"
+		compile "net.sf.ehcache:ehcache:${ehcacheVersion}"
+		compile "org.eclipse.persistence:eclipselink:${eclipseLinkVersion}"
+		compile "org.springframework:spring-jms:${springVersion}"
+		compile fileTree(dir: 'libs', include: '*.jar')
+		//DB dependency
+		compile configurations.DBDriver.asFileTree
+		compile "org.springframework:spring-jdbc:${springVersion}"
+		compile "org.springframework:spring-orm:${springVersion}"
+		
+		compile "io.springfox:springfox-swagger2:${swagger}"
+		compile "io.springfox:springfox-swagger-ui:${swagger}"
+		
+		compile "org.codehaus.jackson:jackson-mapper-asl:1.4.2"
+        compile "org.codehaus.jackson:jackson-core-asl:1.4.2"
+		//compile "org.apache.ws.security:wss4j:${wss4jVersion}"
+		//compile "org.apache.axis2:axis2:${axisVersion}"
+		//compile "org.apache.axis2:axis2-kernel:${axisVersion}"
+		//compile "org.apache.axis2:axis2-adb:${axisVersion}"
+		//compile "org.apache.axis2:axis2-transport-local:${axisVersion}"
+		//compile "org.apache.axis2:axis2-transport-http:${axisVersion}"
+		
+		compile "joda-time:joda-time:2.9.9"
+		
+		// compile "org.hibernate:hibernate-core:${hibernate4Version}"
+		// compile "org.hibernate:hibernate-entitymanager:${hibernate4Version}"
+		// compile "org.hibernate:hibernate-ehcache:${hibernate4Version}"
+		// compile "org.hibernate.common:hibernate-commons-annotations:${hibernateAnnotationsVersion}"
+		// compile "org.hibernate.javax.persistence:hibernate-jpa-2.1-api:${hibernateJpaVersion}"
+		// compile "org.springframework.data:spring-data-jpa:${springDataJpaVersion}"
+		compile "com.github.spartatech:spring-web-utils-java8:${spartaspringwebutilsVersion}"
+		compile "org.springframework.ws:spring-ws-core:${springwsVersion}"
+		//compile "com.opencsv:opencsv:3.9"
+		
+
+		compile project(":${rootname}Core")
+	}
+}
+
+
+def getPlaceHolders(project){
+	 def placeHolders=[:]
+
+     project.properties.each{ key,value->
+		if(value instanceof String || value instanceof Number){
+			def moduleName = project.moduleName
+			String startStr = "${moduleName}."
+			if(key.startsWith(startStr)){
+				placeHolders[key]=value
+				String shortKey = key - "${moduleName}."
+				placeHolders[shortKey]=value
+			}else {
+				String keyStr = "${moduleName}.${key}"
+				if(!placeHolders.containsKey(keyStr)){
+					placeHolders[keyStr] = value
+					placeHolders[key] = value
+				}
+			}
+		}
+	}
+    return placeHolders
+}
+
+
+/*
+ * Support publication of artifacts versioned by topic branch.
+ * CI builds supply `-P BRANCH_NAME=<TOPIC>` to gradle at build time.
+ * If <TOPIC> starts with 'ACP-', change version
+ *     from BUILD-SNAPSHOT => <TOPIC>-SNAPSHOT
+ *     e.g. 3.2.1.BUILD-SNAPSHOT => 3.2.1.ACP-1234-SNAPSHOT
+ */
+def qualifyVersionIfNecessary(version) {
+    if (rootProject.hasProperty("BRANCH_NAME")) {
+        def qualifier = rootProject.getProperty("BRANCH_NAME")
+        if (qualifier.startsWith("nutri-")) {
+            return version.replace('BUILD', qualifier)
+        }
+    }
+    return version
+}
